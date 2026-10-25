@@ -61,11 +61,15 @@ def principal_from(auth):
         raise HTTPException(401, "Authentication required")
     return hashlib.sha256(token.encode()).hexdigest()
 
-def require_protocol(version, content_type):
+
+def require_protocol(version, content_type, require_content_type=True):
     if version != "1.0":
         raise HTTPException(400, "Unsupported A2A version")
-    if not content_type or content_type.split(";")[0].strip() != A2A_MEDIA:
+    if require_content_type and (
+        not content_type or content_type.split(";")[0].strip() != A2A_MEDIA
+    ):
         raise HTTPException(415, "Unsupported media type")
+
 
 def card():
     base = BASE_URL if BASE_URL.endswith("/") else BASE_URL + "/"
