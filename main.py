@@ -337,7 +337,7 @@ async def continue_task(msg, data, principal, mid, mh):
 @app.get("/a2a/tasks")
 async def list_tasks(authorization: str = Header(default=None), a2a_version: str = Header(default=None), content_type: str = Header(default=None)):
     principal = principal_from(authorization)
-    require_protocol(a2a_version, content_type)
+    require_protocol(a2a_version, content_type, False)
     with db() as c:
         rows = c.execute("SELECT task_json FROM tasks WHERE principal_hash=? ORDER BY created_at DESC", (principal,)).fetchall()
     return JSONResponse({"tasks": [json.loads(r["task_json"]) for r in rows]}, media_type=A2A_MEDIA)
@@ -345,7 +345,7 @@ async def list_tasks(authorization: str = Header(default=None), a2a_version: str
 @app.get("/a2a/tasks/{task_id}")
 async def read_task(task_id: str, authorization: str = Header(default=None), a2a_version: str = Header(default=None), content_type: str = Header(default=None)):
     principal = principal_from(authorization)
-    require_protocol(a2a_version, content_type)
+    require_protocol(a2a_version, content_type, False)
     row = get_task_row(task_id, principal)
     if not row:
         raise HTTPException(404, "Task not found")
